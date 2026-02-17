@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Menu } from "lucide-react";
 import Image from "next/image";
 
@@ -24,9 +24,9 @@ export default function Navbar() {
                     <Image
                         src="/full_logo.png"
                         alt="Diktium"
-                        width={180}
-                        height={44}
-                        className="h-11 w-auto"
+                        width={100}
+                        height={34}
+                        className="h-8 md:h-11 w-auto"
                         style={{ width: "auto", height: "auto" }}
                         priority
                     />
@@ -59,7 +59,9 @@ export default function Navbar() {
                                 <span className="sr-only">Toggle menu</span>
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="right">
+                        <SheetContent side="right" className="p-6">
+                            <SheetTitle className="sr-only">Menu</SheetTitle>
+                            <SheetDescription className="sr-only">Navigation menu</SheetDescription>
                             <div className="flex flex-col gap-6 mt-10">
                                 {navLinks.map((link) => (
                                     <Link
