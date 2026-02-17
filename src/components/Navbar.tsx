@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Zap } from "lucide-react";
+import { Menu } from "lucide-react";
+import Image from "next/image";
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -19,13 +20,16 @@ export default function Navbar() {
         <nav className="fixed top-0 w-full z-50 border-b border-border/40 bg-background/80 backdrop-blur-md shadow-sm">
             <div className="container mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2">
-                    <div className="bg-primary p-1.5 rounded-lg">
-                        <Zap className="h-5 w-5 text-primary-foreground" />
-                    </div>
-                    <span className="font-bold text-xl tracking-tight text-primary">
-                        Diktium
-                    </span>
+                <Link href="/" className="flex items-center">
+                    <Image
+                        src="/full_logo.png"
+                        alt="Diktium"
+                        width={180}
+                        height={44}
+                        className="h-11 w-auto"
+                        style={{ width: "auto", height: "auto" }}
+                        priority
+                    />
                 </Link>
 
                 {/* Desktop Nav */}

@@ -15,6 +15,10 @@ const robotoMono = Roboto_Mono({
 export const metadata: Metadata = {
   title: "Diktium - Κατασκευή Ιστοσελίδων",
   description: "Σύγχρονες ιστοσελίδες για επιχειρήσεις που θέλουν να ξεχωρίζουν.",
+  icons: {
+    icon: "/logo.png",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({

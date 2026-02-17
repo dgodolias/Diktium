@@ -20,7 +20,7 @@ export default function Hero() {
                 >
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-secondary/80 text-secondary-foreground text-sm font-medium mb-6 backdrop-blur-sm border border-secondary">
                         <span className="flex h-2 w-2 rounded-full bg-accent"></span>
-                        Νέα νομοθεσία ΓΕΜΗ: Είστε καλυμμένοι;
+                        Σύγχρονες Ιστοσελίδες για κάθε Επιχείρηση
                     </div>
 
                     <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-primary mb-6 max-w-4xl mx-auto leading-tight">
@@ -28,7 +28,7 @@ export default function Hero() {
                     </h1>
 
                     <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-                        Συμμόρφωση με το ΓΕΜΗ, μοντέρνος σχεδιασμός και άμεση υποστήριξη.
+                        Μοντέρνος σχεδιασμός, SEO και πλήρης συμμόρφωση ΓΕΜΗ.
                         Δημιουργούμε την ψηφιακή εικόνα που αξίζει στην επιχείρησή σας.
                     </p>
 
@@ -48,15 +48,15 @@ export default function Hero() {
                     <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-accent" />
-                            <span>Συμμόρφωση ΓΕΜΗ</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <CheckCircle2 className="h-4 w-4 text-accent" />
-                            <span>Mobile First Design</span>
+                            <span>Μοντέρνος Σχεδιασμός</span>
                         </div>
                         <div className="flex items-center gap-2">
                             <CheckCircle2 className="h-4 w-4 text-accent" />
                             <span>SEO Optimized</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <CheckCircle2 className="h-4 w-4 text-accent" />
+                            <span>Συμμόρφωση ΓΕΜΗ</span>
                         </div>
                     </div>
                 </motion.div>

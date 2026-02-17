@@ -1,53 +1,49 @@
-# Diktium
+# Diktium Agency Website & Data System
 
 ## Current Status
-- **Phase**: MVP Development (Completed)
-- **Last Updated**: 2026-01-14 21:55
-- **Current Focus**: Verification & Delivery
+- **Phase**: Refactoring & Verification
+- **Last Updated**: 2026-01-16 10:35
+- **Current Focus**: Restoring automation scripts and finalizing project structure.
 
 ## Tech Stack
-- **Frontend**: Next.js 14, Tailwind CSS, Framer Motion, Shadcn/UI, Lucide React
-- **Backend**: Next.js App Router
-- **Database**: N/A
-- **Tools**: TypeScript, ESLint, Semgrep
+- **Frontend**: Next.js 14, Tailwind CSS, Shadcn UI, Framer Motion
+- **Backend**: Node.js (Extraction Scripts)
+- **Database**: Excel (Temporary Data Storage)
+- **Tools**: Semgrep, Puppeteer (removed), Axios
 
 ## Architecture
 ```text
-src/
-├── app/
-│   ├── globals.css (Navy Blue Theme)
-│   ├── layout.tsx (Root Layout)
-│   └── page.tsx (Landing Page Assembly)
-├── components/
-│   ├── Navbar.tsx
-│   ├── Hero.tsx
-│   ├── Portfolio.tsx
-│   ├── Services.tsx
-│   ├── WhyUs.tsx
-│   ├── Contact.tsx
-│   ├── Footer.tsx
-│   └── ui/ (Shadcn components)
+Diktium/
+├── .git/
+├── .mid/                 # Middleware / Agent Config
+├── api/
+│   ├── scripts/
+│   │   └── explore_api.js # Business Data Extraction
+│   ├── package.json
+│   ├── business_data.xlsx
+│   └── node_modules/
+├── website/              # Next.js Application
+│   ├── src/
+│   ├── public/
+│   ├── package.json
+│   └── ...
+├── CONTEXT.md            # Source of Truth
+└── README.md
 ```
 
 ## Key Dependencies
-- next
-- react
-- tailwindcss
-- tailwindcss-animate
-- framer-motion
-- lucide-react
+- **Frontend**: `framer-motion`, `lucide-react`, `tailwindcss`
+- **Scripting**: `axios`, `xlsx`
 
 ## Development Log (History)
-- 2026-01-14 22:15 **Visual Refinement**: Reverted to White Theme with dark particles. Optimized Navbar contrast.
-- 2026-01-14 22:05 **Visual Effects**: Implemented "Antigravity" particle background and glassmorphism.
-- 2026-01-14 22:00 **Portfolio Enhancement**: Captured real screenshots of client sites and updated UI with premium effects.
-- 2026-01-14 21:55 **Verification**: Passed build and security checks.
-- 2026-01-14 21:45 **Landing Page**: Implemented all core sections (Hero, Portfolio, Services, Contact).
-- 2026-01-14 21:35 **Initialization**: Started project setup.
+- 2026-01-14 20:00 **Visual Enhancement**: Implemented particle background and glassmorphic UI.
+- 2026-01-14 22:00 **Data Extraction**: Built and verified IKE business extraction script (400 records).
+- 2026-01-16 10:30 **Git Maintenance**: Reverted accidental commit and restored `api` folder structure.
 
 ## Roadmap (All Steps)
-- [x] Initialize Next.js project
-- [x] Setup Tailwind & Shadcn/UI
-- [x] Implementation of Landing Page (Hero, Portfolio, Services, Why Us, Contact)
-- [x] Responsive Design Verification
-- [x] SEO Optimization
+- [x] Create Navigation Bar
+- [x] Build Hero Section
+- [x] Implement Particle Background
+- [x] Business Data Extraction Script (v1 Verified)
+- [ ] Automate Weekly Data Extraction
+- [ ] Integrate Data with Frontend Dashboard

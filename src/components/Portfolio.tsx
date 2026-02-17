@@ -39,10 +39,10 @@ const projects = [
         image: "/screenshots/masterfrigo.png",
     },
     {
-        title: "Mag Frigo",
-        category: "Transport / Industrial",
-        url: "https://magfrigo.gr/",
-        image: "/screenshots/magfrigo.png",
+        title: "Δημοσθένης Γκοντόλιας",
+        category: "Personal / Portfolio",
+        url: "https://dimosthenisgkontolias.com",
+        image: "/screenshots/gkontolias.png",
     },
 ];
 
@@ -53,7 +53,6 @@ export default function Portfolio() {
             <div className="absolute inset-0 z-0">
                 <div className="absolute top-1/4 left-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
                 <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent/5 rounded-full blur-3xl" />
-                <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-[0.03] dark:opacity-[0.05]" />
             </div>
 
             <div className="container relative z-10 px-4 md:px-6 mx-auto">
