@@ -4,6 +4,7 @@ from typing import Any
 
 import httpx
 
+from .config import RunConfig
 from .settings import Settings
 
 logger = logging.getLogger(__name__)
@@ -14,13 +15,14 @@ class ApiError(Exception):
 
 
 class ApiClient:
-    def __init__(self, settings: Settings) -> None:
+    def __init__(self, settings: Settings, run: RunConfig) -> None:
         self.settings = settings
+        self.run = run
         self.client = httpx.Client(
             base_url=settings.api_base_url,
             headers={"api_key": settings.api_key, "Accept": "application/json"},
             timeout=120.0,
-            verify=settings.verify_ssl,
+            verify=run.verify_ssl,
         )
 
     def close(self) -> None:
@@ -32,6 +34,10 @@ class ApiClient:
     def __exit__(self, *_: object) -> None:
         self.close()
 
+    def _backoff_for(self, attempt: int) -> float:
+        raw = self.run.server_error_backoff_sec * (2 ** (attempt - 1))
+        return min(raw, self.run.server_error_backoff_max_sec)
+
     def get(self, path: str, params: dict[str, Any] | None = None) -> Any:
         """GET with 429 / 5xx / read-timeout retries and inter-request throttling."""
         server_error_attempts = 0
@@ -39,12 +45,12 @@ class ApiClient:
             try:
                 response = self.client.get(path, params=params)
             except httpx.ReadTimeout as exc:
-                if server_error_attempts < self.settings.server_error_retries:
+                if server_error_attempts < self.run.server_error_retries:
                     server_error_attempts += 1
-                    backoff = self.settings.server_error_backoff_sec * (2 ** (server_error_attempts - 1))
+                    backoff = self._backoff_for(server_error_attempts)
                     logger.warning(
-                        "Read timeout on %s (attempt %d) — retrying in %.0fs",
-                        path, server_error_attempts, backoff,
+                        "Read timeout on %s (attempt %d/%d) — retrying in %.0fs",
+                        path, server_error_attempts, self.run.server_error_retries, backoff,
                     )
                     time.sleep(backoff)
                     continue
@@ -55,21 +61,22 @@ class ApiClient:
             if response.status_code == 429:
                 logger.warning(
                     "Rate limit hit on %s — sleeping %.0fs",
-                    path, self.settings.rate_limit_retry_sec,
+                    path, self.run.rate_limit_retry_sec,
                 )
-                time.sleep(self.settings.rate_limit_retry_sec)
+                time.sleep(self.run.rate_limit_retry_sec)
                 continue
 
             if response.status_code == 401:
                 raise ApiError(f"Unauthorized (401) on {path} — check API_KEY")
 
             if response.status_code >= 500:
-                if server_error_attempts < self.settings.server_error_retries:
+                if server_error_attempts < self.run.server_error_retries:
                     server_error_attempts += 1
-                    backoff = self.settings.server_error_backoff_sec * (2 ** (server_error_attempts - 1))
+                    backoff = self._backoff_for(server_error_attempts)
                     logger.warning(
-                        "Server %d on %s (attempt %d) — retrying in %.0fs",
-                        response.status_code, path, server_error_attempts, backoff,
+                        "Server %d on %s (attempt %d/%d) — retrying in %.0fs",
+                        response.status_code, path, server_error_attempts,
+                        self.run.server_error_retries, backoff,
                     )
                     time.sleep(backoff)
                     continue
@@ -85,5 +92,5 @@ class ApiClient:
                 )
 
             data = response.json()
-            time.sleep(self.settings.request_delay_sec)
+            time.sleep(self.run.request_delay_sec)
             return data

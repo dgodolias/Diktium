@@ -5,21 +5,13 @@ import psycopg
 
 from . import db, extractors
 from .api_client import ApiClient, ApiError
+from .config import RunConfig
 from .filters import (
     is_below_incorporation_threshold,
     matches_client_side,
     to_api_params,
 )
 from .models import CompanyFilter
-from .settings import Settings
-
-BELOW_THRESHOLD_STOP_STREAK = 400
-"""Consecutive out-of-range rows that trigger an early stop.
-
-Because `-incorporationDate` sort puts the (bogus) 9011 / 5015 future-dated entries at
-the top and then good data in a valid descending order, we need tolerance before
-concluding we've crossed the lower bound. Two full 200-record pages in a row of dates
-below the filter threshold is the safety margin."""
 
 logger = logging.getLogger(__name__)
 
@@ -45,35 +37,38 @@ def _list_page(
 def fetch_list(
     conn: psycopg.Connection,
     api: ApiClient,
-    settings: Settings,
+    run: RunConfig,
     filt: CompanyFilter,
     filter_set_id: int,
-    max_pages: int | None = None,
 ) -> int:
     """Walk /companies pages, upserting records and linking them to this filter set.
 
     Pages already marked 'done' in fetch_progress are skipped, so closing and reopening
-    the run picks up exactly where it left off.
+    the run picks up exactly where it left off. Pages that exhaust retries are marked
+    'errored' and — depending on `run.skip_page_on_exhausted_retries` — either trigger
+    an abort or are skipped so the scan can continue (the next run will retry them).
     """
-    cap = max_pages if max_pages is not None else settings.max_pages
     done = db.completed_pages(conn, filter_set_id)
     logger.info(
         "Filter set %d: %d page(s) already done, scanning up to page %d",
-        filter_set_id, len(done), cap - 1,
+        filter_set_id, len(done), run.max_pages - 1,
     )
 
     new_company_count = 0
     matched_total = 0
     below_streak = 0
-    for page in range(cap):
+    for page in range(run.max_pages):
         if page in done:
             continue
 
         try:
-            rows = _list_page(api, filt, page, settings.page_size)
+            rows = _list_page(api, filt, page, run.page_size)
         except ApiError as exc:
             logger.error("Page %d failed: %s", page, exc)
             db.mark_page(conn, filter_set_id, page, "errored", 0, str(exc)[:500])
+            if run.skip_page_on_exhausted_retries:
+                logger.warning("Skipping page %d — will retry on next run", page)
+                continue
             raise
 
         if not rows:
@@ -109,7 +104,7 @@ def fetch_list(
             matched_total, below_streak,
         )
 
-        if below_streak >= BELOW_THRESHOLD_STOP_STREAK:
+        if below_streak >= run.below_threshold_stop_streak:
             logger.info(
                 "Early stop — %d consecutive rows below incorporation_from",
                 below_streak,
@@ -122,19 +117,18 @@ def fetch_list(
 def fetch_details(
     conn: psycopg.Connection,
     api: ApiClient,
+    run: RunConfig,
     filter_set_id: int,
-    detail_path: str = "/companies/{ar_gemi}",
-    limit: int | None = None,
 ) -> int:
     """For every company in this filter set without detail_fetched_at, call the detail
     endpoint and enrich the row. Already-enriched companies (from prior runs) are skipped.
     """
-    pending = db.pending_detail_gemis(conn, filter_set_id, limit=limit)
+    pending = db.pending_detail_gemis(conn, filter_set_id, limit=run.detail_limit)
     logger.info("Filter set %d: %d companies pending detail fetch", filter_set_id, len(pending))
 
     processed = 0
     for ar_gemi in pending:
-        path = detail_path.format(ar_gemi=ar_gemi)
+        path = run.detail_path.format(ar_gemi=ar_gemi)
         try:
             response = api.get(path)
         except ApiError as exc:
